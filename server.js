@@ -1,25 +1,27 @@
 import express from 'express';
-import mysql from 'mysql';
+import mysql from 'mysql2';
 import cors from 'cors';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import cookieParser from 'cookie-parser';
+import dotenv from 'dotenv';
 
+dotenv.config();
 const salt = 10;
 const app = express();
 app.use(express.json());
 app.use(cors({
-    origin: ["http://localhost:3000"],
+    origin: process.env.BASE_URL_FE,
     methods: ["GET", "POST"],
     credentials: true
 }));
 app.use(cookieParser());
-const port = process.env.PORT || 8081;
+const port = process.env.AUTH_SERVICE_PORT || 3077;
 const db = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "",
-    database: "auth_db"
+    host: process.env.AUTH_SERVICE_HOST,
+    user: process.env.AUTH_SERVICE_USER,
+    password: process.env.AUTH_SERVICE_PASSWORD,
+    database: process.env.AUTH_SERVICE_DATABASE
 });
 
 db.connect((err) => {
@@ -31,13 +33,13 @@ db.connect((err) => {
 })
 
 app.post('/register', (req, res) => {
-    const checkEmailQuery = "SELECT * FROM auth_service WHERE email = (?)";
+    const checkEmailQuery = "SELECT * FROM auth WHERE email = (?)";
 
     db.query(checkEmailQuery, [req.body.email], (err, data) => {
         if (err) return res.json({Error: "Error for checking email"});
         if (data.length > 0) return res.json({Error: "Email already exists"});
 
-        const sql = "INSERT INTO auth_service (`email`,`password`) VALUES (?)";
+        const sql = "INSERT INTO auth (`email`,`password`) VALUES (?)";
         bcrypt.hash(req.body.password.toString(), salt, (err, hash) => {
             if (err) return res.json({Error: "Error for hashing password"});
             const data = [
@@ -53,7 +55,7 @@ app.post('/register', (req, res) => {
 })
 
 app.post('/login', (req, res) => {
-    const sql = "SELECT * FROM auth_service WHERE email = (?)";
+    const sql = "SELECT * FROM auth WHERE email = (?)";
     db.query(sql, [req.body.email], (err, data) => {
         if (err) return res.json({Error: "Login failed"});
         if (data.length > 0) {
