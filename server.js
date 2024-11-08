@@ -11,9 +11,8 @@ const salt = 10;
 const app = express();
 app.use(express.json());
 app.use(cors({
-    origin: process.env.BASE_URL_FE,
-    methods: ["GET", "POST"],
-    credentials: true
+    origin: '*',
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
 }));
 app.use(cookieParser());
 const port = process.env.AUTH_SERVICE_PORT || 3077;
@@ -26,9 +25,9 @@ const db = mysql.createConnection({
 
 db.connect((err) => {
     if (err) {
-        console.log("Error in connecting to MySQL" + err);
+        console.log("Error in connecting to MySQL" + err + " at " + process.env.AUTH_SERVICE_HOST + ":" + process.env.AUTH_SERVICE_PORT);
     } else {
-        console.log("Connected to MySQL");
+        console.log("Connected to MySQL at " + process.env.AUTH_SERVICE_HOST + ":" + process.env.AUTH_SERVICE_PORT);
     }
 })
 
