@@ -11,7 +11,7 @@ on:
 
 jobs:
   call-reusable-workflow:
-    uses: NT548-P11-DevOps-Technology/class-management-FE/.github/workflows/reusable-ci.yml@main
+    uses: NT548-P11-DevOps-Technology/class-management-FE/.github/workflows/main.yml@main
     secrets:
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
